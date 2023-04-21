@@ -9,6 +9,7 @@
     "functional": "cpp",
     "random": "cpp",
     "istream": "cpp",
-    "limits": "cpp"
+    "limits": "cpp",
+    "cmath": "cpp"
   }
 }
