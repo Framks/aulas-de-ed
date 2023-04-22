@@ -191,5 +191,7 @@ int main()
         default:
             break;
         }
+        cout << "Deseja continuar? se sim digite 1 se não digite 0: ";
+        cin >> loop;
     }
 }
