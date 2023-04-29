@@ -10,6 +10,8 @@
     "random": "cpp",
     "istream": "cpp",
     "limits": "cpp",
-    "cmath": "cpp"
-  }
+    "cmath": "cpp",
+    "fstream": "cpp"
+  },
+  "C_Cpp.errorSquiggles": "enabledIfIncludesResolve"
 }
