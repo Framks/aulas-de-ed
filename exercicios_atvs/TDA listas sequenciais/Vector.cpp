@@ -105,6 +105,7 @@ void Vector::pop_back()
 { // O(1)
     if (m_size > 0)
     {
-        m_list[m_size] = NULL;
+        m_list[m_size - 1] = NULL;
+        m_size--;
     }
 }
