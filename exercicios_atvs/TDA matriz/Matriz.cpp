@@ -7,15 +7,25 @@ using namespace std;
 // Aloca espaco dinamicamente para matriz com m linhas e n colunas
 Matriz::Matriz(int m, int n)
 {
-    col = l;
+    col = n;
     lin = m;
-    mat = new int[l][m];
+    mat = new int *[m];
+    for (int i = 0; i < m; i++)
+    {
+        mat[i] = new int[n];
+    };
 }
 
 // Destrutor: Libera a memoria que foi alocada dinamicamente no construtor
 Matriz::~Matriz()
 {
-    delete[][] mat;
+    for (int i = 0; i < linhas(); i++)
+    {
+        delete[] mat[i];
+    }
+
+    delete[] mat;
+    cout << "matriz liberada" << endl;
 }
 
 // Retorna o numero de linhas da matriz
@@ -58,9 +68,45 @@ void Matriz::print()
 // Soma matrizes
 Matriz *Matriz::soma(Matriz &B)
 {
+    if (B.linhas() == linhas() && B.colunas() == colunas())
+    {
+        Matriz *resultado = new Matriz(linhas(), colunas());
+        for (int i = 0; i < linhas(); i++)
+        {
+            for (int j = 0; j < colunas(); j++)
+            {
+                resultado->setValor(B.getValor(i, j) + getValor(i, j), i, j);
+            }
+        }
+        return resultado;
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 // Multiplica matrizes
 Matriz *Matriz::multiplica(Matriz &B)
 {
+    if (colunas() <= B.linhas() && linhas() <= B.colunas())
+    {
+        Matriz *mult = new Matriz(linhas(), B.colunas());
+        for (int i = 0; i < linhas(); i++)
+        {
+            for (int j = 0; j < B.colunas(); j++)
+            {
+                mult->setValor(0, i, j);
+                for (int k = 0; k < colunas(); k++)
+                {
+                    mult->setValor((mult->getValor(i, j) + (getValor(i, k) * B.getValor(k, j))), i, j);
+                }
+            }
+        }
+        return mult;
+    }
+    else
+    {
+        return nullptr;
+    }
 }
