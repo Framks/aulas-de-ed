@@ -55,7 +55,13 @@ public:
     // Remove o ultimo elemento da lista se a lista nao
     // estiver vazia. Caso contrario, faz nada 
     void pop_back(); // O(1)
-     
+    
+    // Adiciona o elemento value no indice k
+    // (somente se 0 <= k <= m_size).
+    //  Antes de fazer a inserção, todos os elementos
+    // do indice k em diante são deslocados
+    // uma posição para a direita.
+    void insert(int value, int k); 
 };
 
 #endif

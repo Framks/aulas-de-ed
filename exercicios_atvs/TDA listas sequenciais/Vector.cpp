@@ -1,7 +1,6 @@
 #include <iostream>
 #include <stdexcept>
 #include "Vector.h"
-using namespace std;
 
 // Construtor default: aloca uam lista com
 // capacidade inicial igual a 16 e size = 0 // O(1)
@@ -45,13 +44,18 @@ int Vector::size() const
 // Retorna true se e somente se a lista estiver vazia
 bool Vector::empty() const
 { // O(1)
-    return m_list == nullptr;
+    return m_size == 0;
 }
 
 // Retorna uma referencia para o elemento na posicao k.
 // Essas funcoes nao verificam se o indice eh valido.
 int &Vector::operator[](int index)
 { // O(1)
+    return m_list[index];
+}
+
+const int &Vector::operator[](int index) const
+{
     return m_list[index];
 }
 
@@ -64,18 +68,27 @@ int &Vector::at(int k)
     if (k >= 0 && k <= size())
         return m_list[k];
     else
-        throw out_of_range("erro: indice invalido");
+        throw std::out_of_range("erro: indice invalido");
+}
+
+const int &Vector::at(int k) const
+{
+    if (k >= 0 && k <= size())
+        return m_list[k];
+    else
+        throw std::out_of_range("erro: indice invalido");
 }
 
 // Recebe um inteiro como argumento e o adiciona
 // logo apos o ultimo elemento da lista.
 void Vector::push_back(const int &value)
 { // tempo medio O(1)
-    if (m_size < m_capacity)
+    if (m_size >= m_capacity)
     {
-        m_list[m_size] = value;
-        m_size++;
+        reserve(2 * m_capacity);
     }
+    m_list[m_size] = value;
+    m_size++;
 }
 
 // Solicita que a capacidade do vetor seja >= n.
@@ -103,9 +116,32 @@ void Vector::reserve(int n)
 // estiver vazia. Caso contrario, faz nada
 void Vector::pop_back()
 { // O(1)
-    if (m_size > 0)
+    if (!empty())
     {
-        m_list[m_size - 1] = NULL;
         m_size--;
     }
+}
+
+    // Adiciona o elemento value no indice k
+// (somente se 0 <= k <= m_size).
+//  Antes de fazer a inserção, todos os elementos
+// do indice k em diante são deslocados
+// uma posição para a direita.
+void Vector::insert(int value, int k){
+    if (k >= 0 && k <= m_size)
+    {
+        if (m_size >= m_capacity)
+        {
+            reserve(2 * m_capacity);
+        }
+        for (int i = m_size-1; i >= k ; i--)
+        {
+            m_list[i+1] = m_list[i];
+        }
+        m_list[k] = value;
+        m_size++;
+    }else{
+        throw std::out_of_range("indice invalido");
+    }
+    
 }
