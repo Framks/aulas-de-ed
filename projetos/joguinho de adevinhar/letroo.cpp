@@ -8,6 +8,10 @@
 #include <limits>
 using namespace std;
 
+const string ARQUIVO = "clients.txt";
+const int QUANT_TENTATIVAS = 6;
+const int TAMANHO_pALAVRA = 5;
+
 // função que testa se o sistema é linux ou windows e limpa a tela para as duas plataformas
 void limparTela()
 {
@@ -18,9 +22,10 @@ void limparTela()
 #endif
 }
 
+// esta função retorna uma palavra escolhida aleatoriamente do arquivo clients.txt
 string carregarPalavra()
 {
-    ifstream outClientFile("clients.txt", ios::in);
+    ifstream outClientFile(ARQUIVO, ios::in);
     vector<string> dicionario;
     srand(time(NULL));
     string nome;
@@ -37,6 +42,7 @@ string carregarPalavra()
     return dicionario[rand() % dicionario.size()];
 }
 
+// imprimi apenas o inicio
 void menuInicial()
 {
     cout << "               BEM VINDO AO JOGO DA FORCA REMASTERIZADO KKKKK \n\n"
@@ -47,37 +53,45 @@ void menuInicial()
          << endl;
 }
 
-string verificarPalavra(string palavra, string palavraEscolhida)
+// verifica se a palavra esta correta e retorna uma string onde
+// o 1 significa que a letra esta na posição certa
+// o 0 significa que a letra esta na posição errada
+// o 2 significa que não tem a letra na palavra
+string verificarPalavra(string jogadas[], string palavra, string palavraEscolhida)
 {
-    string resultado = "";
     if (palavra.length() != 5)
     {
-        return resultado;
+        return "";
     }
-    else
+
+    string result = "";
+    for (int i = 0; i < TAMANHO_pALAVRA; i++)
     {
-        for (char c : palavra)
+        for (int j = 0; j < TAMANHO_pALAVRA; j++)
         {
-            for (char d : palavraEscolhida)
+            if (palavra[i] == palavraEscolhida[j] && i == j)
             {
-                if (c == d)
-                {
-                    resultado += c;
-                    break;
-                }
-                else
-                {
-                    resultado += " ";
-                }
+                result += "1";
+                break;
+            }
+            else if (palavra[i] == palavraEscolhida[j] && i != j)
+            {
+                result += "0";
+                break;
             }
         }
-        return resultado;
+        if (result.length() < i + 1)
+        {
+            result += "2";
+        }
     }
+    return result;
 }
 
-void imprimirJogadas(string jogadas[] = 0)
+// imprime cada rodada na tela
+void imprimirJogadas(string jogadas[])
 {
-    if (jogadas)
+    if (jogadas != nullptr)
     {
         for (int i = 0; i < jogadas->length(); i++)
         {
@@ -89,8 +103,8 @@ void imprimirJogadas(string jogadas[] = 0)
 // executa as 5 rodadas de cada partidas
 void jogar()
 {
-    string jogadas[5];                           // vetor que contera todas as jogadas do player
-    int rodadas = 6;                             // numero de que o jogador tera
+    string jogadas[5], palavra;                  // vetor que contera todas as jogadas do player
+    int rodadas = QUANT_TENTATIVAS;              // numero de que o jogador tera
     int i = 0;                                   // rodadas atuais
     string palavraEscolhida = carregarPalavra(); // palavra escolhida randomicamente
     limparTela();                                // vai limpar a tela em cada rodada
@@ -99,17 +113,17 @@ void jogar()
     {
         imprimirJogadas(jogadas);
         cout << "voce tem " << rodadas - i << " rodadas para acertar a palavra,\n digite uma palavra de 5 letras: " << endl;
-        cin >> jogadas[i];
-        string resultado = verificarPalavra(jogadas[i], palavraEscolhida);
+        cin >> palavra;
+        string resultado = verificarPalavra(jogadas, palavra, palavraEscolhida);
         if (resultado != "")
         {
             cout << resultado << endl;
+            i++;
         }
         else
         {
             cout << "digite uma palavra valida: " << endl;
         }
-        i++;
     }
 }
 
@@ -120,7 +134,7 @@ int main()
     while (loop)
     {
         jogar();
-        cout << "se deseja jogar novamente digite 1 se não digite 0: ";
+        cout << "se deseja jogar novamente digite 1 se nao digite 0: ";
         cin >> loop;
     }
     system("pause");
