@@ -38,6 +38,7 @@ void ver_nota(aluno a1)
 
 int main()
 {
-    aluno a = ler_aluno();
-    ver_nota(a);
+    aluno a = ler_aluno(); // teste
+    ver_nota(a);    // teste
+    cout << endl; // teste
 }
