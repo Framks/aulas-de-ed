@@ -37,9 +37,6 @@ public:
     // saber se uma fila esta fazia
     bool empty();
 
-    // construtor de copia
-    Queue(const Queue& q);
-
     // sobrecarga do operador de atribuicao
     Queue& operator=(const Queue& q);
 
@@ -144,8 +141,20 @@ bool Queue<T>::operator==(const Queue& q) const {
 }
 
 template<typename T>
-Queue& Queue<T>::operator=(const Queue& q){
-    
+Queue<T>& Queue<T>::operator=(const Queue& q){
+    if (this != &q)
+    {
+        delete first;
+        first = last = nullptr;
+        size = 0;
+        Node<T> *aux = q.first;
+        while (aux != nullptr)
+        {
+            push(aux->value);
+            aux = aux->next;
+        }
+    }
+    return *this;
 }
 
 #endif
