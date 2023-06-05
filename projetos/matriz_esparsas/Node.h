@@ -25,12 +25,6 @@ struct Node
         this->down = down;
         this->value = value;
     }
-
-    ~Node(){
-        delete right;
-        delete down;
-    }
-
 };
 
 #endif

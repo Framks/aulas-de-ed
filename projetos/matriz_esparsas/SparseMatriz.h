@@ -69,6 +69,16 @@ SparseMatriz::SparseMatriz(int coluna, int linha){
 
 // destrutor da matriz 
 SparseMatriz::~SparseMatriz(){
+    Node *aux = m_matriz->right;
+    for (int i = 0; i < linhas; i++)
+    {
+        for (int i = 0; i < colunas; i++)
+        {
+            Node *del = aux;
+            aux = aux->right;
+            delete del;
+        }           
+    }
     delete m_matriz;
 }
 
@@ -117,23 +127,60 @@ void SparseMatriz::insert(int coluna, int linha, double value){
         {
             aux_l = aux_l->right;
         }
-        std::cout <<  std::endl;
         if (get(coluna,linha) != 0)
         {
             aux_c->value = value;
         }else{
             Node *novo = new Node(coluna, linha, value, aux_c->down, aux_l->right);
             aux_c->down = novo;
-            aux_l->right = novo;
-            //std::cout << "Novo " << novo->col << " " << novo->line << " aux: col:"<< aux_c->col << " " << aux_c->line << "line: " << aux_l->col << " " << aux_l->line << std::endl;
+            aux_l->right = novo; 
         }
     }else{
         throw std::out_of_range("Tamanho invalido");
     }
 }
 
+// remove um nó da matriz e muda os valores dos ponteiros dos nós anteriores
 void SparseMatriz::remove(int coluna, int linha){
-
+    if((linha > 0 && coluna > 0) && (linha <= this->linhas && coluna <= this->colunas)){
+        if (get(coluna,linha) != 0)
+        {
+            Node *aux_c = m_matriz;
+            Node *aux_l = m_matriz;
+            while (aux_c->col < coluna)
+            {
+                aux_c = aux_c->right;
+            }
+            while (aux_l->line < linha)
+            {
+                aux_l = aux_l->down;
+            }
+            Node *sentinela_li = aux_l;
+            Node *sentinela_co = aux_c;
+            while(true){
+                if(aux_c->down->line < linha && aux_c->down != sentinela_co){
+                    aux_c = aux_c->down;
+                }else{
+                    break;
+                }
+            }
+            while(true){
+                if(aux_l->down->col < coluna && aux_l->right != sentinela_li){
+                    aux_l = aux_l->right;
+                }else{
+                    break;
+                }
+            }
+            if (aux_c->down == aux_l->right){
+                Node *del = aux_c->down;
+                aux_c->down = del->down;
+                aux_l->right = del->right;
+                delete del;
+            }            
+        }
+    }else{
+        throw std::out_of_range("local invalido");
+    }
 }
 
 void SparseMatriz::print(){
