@@ -9,16 +9,17 @@
 #define NODE
 
 // Nó da matriz esparsa
+template <typename T>
 struct Node
 {
     Node *right;
     Node *down;
     int col;
     int line;
-    double value;
+    T value;
 
     // construtor que recebe respectivamente coluna, linha, valor, ponteiro para a direita, e ponteiro para baixo 
-    Node(int col, int lin, double value, Node *down, Node *right){
+    Node(int col, int lin, T value, Node<T> *down, Node<T> *right){
         this->col = col;
         this->line = lin;
         this->right = right;

@@ -11,54 +11,55 @@
 #include <iostream>
 #include <stdexcept>
 
+template <typename T>
 class SparseMatriz
 {
-private:
-    Node *m_matriz;
+public:
+    Node<T> *m_matriz;
     int linhas;
     int colunas;
-public:
+
     // construtor e destrutor
-    SparseMatriz(int coluna, int linha);
+    SparseMatriz(int linha, int coluna);
     ~SparseMatriz();
 
     // insere um valor na matriz na posição (linha, coluna)
-    void insert(int coluna, int linha, double value);
+    void insert(int linha, int coluna, T value);
 
     // retorna o valor da matriz na posição (linha, coluna)
-    double get(int coluna, int linha);
+    T get(int linha, int coluna);
 
     //função que imprime a matriz na tela inclusive o os elementos iguais a zero
     void print();
 
-    void remove(int coluna, int linha);
-
-    //retorna o valor do tamanho da matriz
-    int size();
+    void remove(int linha, int coluna);
 };
 
 
-// definição do construtor que cria um nó sentinela e a matriz vazia
-SparseMatriz::SparseMatriz(int coluna, int linha){
-    if(linha > 0 && coluna > 0){
+// construtor da matriz que cria uma os nós que vão servir de header para andar na matriz
+// ordem de complexidade dessa função é O(N) pois ele cria uma dimenção depois cria a segunda dimenção
+template <typename T>
+SparseMatriz<T>::SparseMatriz(int linha, int coluna){
+    if((linha > 0 && coluna > 0) && (linha <= 30000 && coluna <= 30000)){
         this->linhas = linha;
         this->colunas = coluna;
-        this->m_matriz = new Node(0,0,-1,nullptr,nullptr);
+        double insert = -1;
+        this->m_matriz = new Node<T>(0,0,insert,nullptr,nullptr);
 
-        Node *aux = this->m_matriz;
+        Node<T> *aux = this->m_matriz;
         
         for (int i = 1; i <= coluna; i++)
         {
-            aux->right = new Node(i,0,-1,nullptr,m_matriz);
+            aux->right = new Node<T>(i,0,insert,nullptr,m_matriz);
             aux = aux->right;
             aux->down = aux;
         }
 
-        Node *aux2 = m_matriz;
+        Node<T> *aux2 = m_matriz;
 
         for (int i = 1; i <= linha; i++)
         {
-            aux2->down = new Node(0,i,-1,m_matriz,nullptr);
+            aux2->down = new Node<T>(0,i,insert,m_matriz,nullptr);
             aux2 = aux2->down;
             aux2->right = aux2;
         }
@@ -68,13 +69,14 @@ SparseMatriz::SparseMatriz(int coluna, int linha){
 }
 
 // destrutor da matriz 
-SparseMatriz::~SparseMatriz(){
-    Node *aux = m_matriz->right;
+template <typename T>
+SparseMatriz<T>::~SparseMatriz(){
+    Node<T> *aux = m_matriz->right;
     for (int i = 0; i < linhas; i++)
     {
         for (int i = 0; i < colunas; i++)
         {
-            Node *del = aux;
+            Node<T> *del = aux;
             aux = aux->right;
             delete del;
         }           
@@ -82,11 +84,14 @@ SparseMatriz::~SparseMatriz(){
     delete m_matriz;
 }
 
-
-double SparseMatriz::get(int coluna, int linha){
+// vai retornar o valor da matriz na posição (linha, coluna), e não existir um nó no lugar ele vai retornar 0
+// se a coluna e linha forem diferentes de 0 se não vai abrir uma excecao
+// ordem de complexidade dessa função é O(N) visto que a matriz tem duas dimenções.
+template <typename T>
+T SparseMatriz<T>::get(int linha, int coluna){
     if(linha > 0 && coluna > 0 && linha <= this->linhas && coluna <= this->colunas){
-        Node *sentinela;
-        Node *aux = this->m_matriz; 
+        Node<T> *sentinela;
+        Node<T> *aux = this->m_matriz; 
         for (int i = 0; i < coluna; i++){
             aux = aux->right;
         }
@@ -99,54 +104,23 @@ double SparseMatriz::get(int coluna, int linha){
         }
         return 0;
     }else{
+        std::cout << "Tamanho invalido linha e coluna: " << linha << " " << coluna << std::endl;
         throw std::out_of_range("local invalido");
     }
 }
 
-void SparseMatriz::insert(int coluna, int linha, double value){
-    if((linha > 0 && coluna > 0) && value != 0){
-        Node *aux_c = m_matriz;
-        Node *aux_l = m_matriz;
-        while (aux_c->col < coluna)
+// vai inserir um valor na matriz na posição (linha, coluna)
+// se o valor da coluna e linha forem diferentes de 0 se não 
+// vai abrir uma excecao 
+// como nós utilizamos a função get para sabermos se ja existe um nó 
+// no lugar que sera inserido o valor, a ordem de complexidade dessa função é O(N²)
+template <typename T>
+void SparseMatriz<T>::insert(int linha, int coluna, T value){
+    if((linha > 0 && coluna > 0)){
+        if (value != 0)
         {
-            aux_c = aux_c->right;
-        }
-        while (aux_l->line < linha)
-        {
-            aux_l = aux_l->down;
-        }
-        Node *sentinela_li = aux_l;
-        Node *sentinela_co = aux_c;
-
-        while (aux_c->down->line < linha && aux_c->down != sentinela_co)
-        {
-            aux_c = aux_c->down;
-        }
-
-        while (aux_l->down->col < coluna && aux_l->right != sentinela_li)
-        {
-            aux_l = aux_l->right;
-        }
-        if (get(coluna,linha) != 0)
-        {
-            aux_c->value = value;
-        }else{
-            Node *novo = new Node(coluna, linha, value, aux_c->down, aux_l->right);
-            aux_c->down = novo;
-            aux_l->right = novo; 
-        }
-    }else{
-        throw std::out_of_range("Tamanho invalido");
-    }
-}
-
-// remove um nó da matriz e muda os valores dos ponteiros dos nós anteriores
-void SparseMatriz::remove(int coluna, int linha){
-    if((linha > 0 && coluna > 0) && (linha <= this->linhas && coluna <= this->colunas)){
-        if (get(coluna,linha) != 0)
-        {
-            Node *aux_c = m_matriz;
-            Node *aux_l = m_matriz;
+            Node<T> *aux_c = m_matriz;
+            Node<T> *aux_l = m_matriz;
             while (aux_c->col < coluna)
             {
                 aux_c = aux_c->right;
@@ -155,40 +129,78 @@ void SparseMatriz::remove(int coluna, int linha){
             {
                 aux_l = aux_l->down;
             }
-            Node *sentinela_li = aux_l;
-            Node *sentinela_co = aux_c;
-            while(true){
-                if(aux_c->down->line < linha && aux_c->down != sentinela_co){
-                    aux_c = aux_c->down;
-                }else{
-                    break;
-                }
+            Node<T> *sentinela_li = aux_l;
+            Node<T> *sentinela_co = aux_c;
+            while (aux_c->down->line < linha && aux_c->down != sentinela_co)
+            {
+                aux_c = aux_c->down;
             }
-            while(true){
-                if(aux_l->down->col < coluna && aux_l->right != sentinela_li){
-                    aux_l = aux_l->right;
-                }else{
-                    break;
-                }
+            while (aux_l->down->col < coluna && aux_l->right != sentinela_li)
+            {
+                aux_l = aux_l->right;
             }
-            if (aux_c->down == aux_l->right){
-                Node *del = aux_c->down;
+            if (get(coluna,linha))
+            {
+                aux_c->down->value = value;
+            }else{
+                Node<T> *novo = new Node<T>(coluna, linha, value, aux_c->down, aux_l->right);
+                aux_c->down = novo;
+                aux_l->right = novo; 
+            }
+        }
+    }else{
+        throw std::out_of_range("Tamanho invalido");
+    }
+}
+
+// remove um nó da matriz e muda os valores dos ponteiros dos nós anteriores
+// ordem de complexidade dessa função é O(N), pois 
+template <typename T>
+void SparseMatriz<T>::remove(int linha, int coluna){
+    if((linha > 0 && coluna > 0) && (linha <= this->linhas && coluna <= this->colunas)){
+        if (get(coluna,linha))
+        {
+            Node<T> *aux_c = m_matriz;
+            Node<T> *aux_l = m_matriz;
+            while (aux_c->col < coluna)
+            {
+                aux_c = aux_c->right;
+            }
+            while (aux_l->line < linha)
+            {
+                aux_l = aux_l->down;
+            }
+            Node<T> *sentinela_li = aux_l;
+            Node<T> *sentinela_co = aux_c;
+            while(aux_c->down->line < linha && aux_c->down != sentinela_co){
+                aux_c = aux_c->down;
+            }
+            while(aux_l->right->col < coluna && aux_l->right != sentinela_li){
+                aux_l = aux_l->right;
+            }
+            if (aux_c->down->line == aux_l->right->line && aux_c->down->col == aux_l->right->col){
+                Node<T> *del = aux_c->down;
                 aux_c->down = del->down;
                 aux_l->right = del->right;
                 delete del;
-            }            
+            }else{
+                std::cout << "inutilizado" << std::endl;
+            }        
         }
     }else{
         throw std::out_of_range("local invalido");
     }
 }
 
-void SparseMatriz::print(){
+// vai impremir a matriz na tela
+// ordem de complexidade dessa função é O(N²), pois
+template <typename T>
+void SparseMatriz<T>::print(){
     for (int i = 1; i <= linhas; i++)
     {
         for (int j = 1; j <= colunas; j++)
         {
-            std::cout << get(j, i) << " ";
+            std::cout << get(i,j) << " ";
         }
         std::cout << std::endl;
     }
