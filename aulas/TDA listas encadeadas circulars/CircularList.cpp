@@ -131,13 +131,3 @@ std::ostream& operator<<(std::ostream& out, CircularList& lst){
     }
     return out;
 }
-
-/*
-void CircularList::push_front(const int& val){
-
-}
-
-void CircularList::pop_front(){
-
-}
-*/

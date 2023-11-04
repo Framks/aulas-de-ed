@@ -37,8 +37,6 @@ void gera_dados(const int& num_iteracoes,const int vetor_tam[]){
 	}
 }
 
-void ler_dados(int tamanho_lista, int vetor[],string nome);
-
 void executar(const int& num_iteracoes,const int vetor_tam[],const string nome_funcao,const string nome_arquivo){
 	ofstream fout(("resultados/"+nome_arquivo+".txt").c_str(), ofstream::out);
 	for (int interacoes = 0; interacoes < num_iteracoes; interacoes++)
@@ -138,18 +136,14 @@ int main(){
 		cin >> entrada;
 		if (entrada == "sair")
 			break;
-		else if(entrada == "bubblesort")
-			executar(TOTAL_N, tam, "bubblesort", "bubblesort");
-		else if (entrada == "selectionsort")
-			executar(TOTAL_N, tam,"selectionsort", "selectionsort");
-		else if(entrada == "insertionsort")
-			executar(TOTAL_N, tam, "insertionsort", "insertionsort");
-		else if(entrada == "mergesort")
-			executar(TOTAL_N, tam, "mergesort", "mergesort");
-		else if(entrada == "quicksort")
-			executar(TOTAL_N, tam, "quicksort", "quicksort");
-		else if(entrada == "radixsort")
-			executar(TOTAL_N, tam, "radixsort", "radixsort");
+		else if(entrada == "bubblesort" || 
+				entrada == "selectionsort" || 
+				entrada == "insertionsort" || 
+				entrada == "mergesort" || 
+				entrada == "quicksort" || 
+				entrada == "radixsort")
+
+			executar(TOTAL_N, tam, entrada, entrada);
 		else 
 			cout << "comando invalido" << endl;
 	}
